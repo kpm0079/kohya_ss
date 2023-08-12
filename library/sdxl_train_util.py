@@ -76,9 +76,7 @@ def _load_target_model(name_or_path: str, vae_path: Optional[str], model_version
         print(f"load Diffusers pretrained models: {name_or_path}, variant={variant}")
         try:
             try:
-                pipe = StableDiffusionXLPipeline.from_pretrained(
-                    name_or_path, torch_dtype=weight_dtype, variant=variant, tokenizer=None
-                )
+                pipe = StableDiffusionXLPipeline.from_pretrained(name_or_path, torch_dtype=weight_dtype, variant=variant, tokenizer=None)
             except EnvironmentError as ex:
                 if variant is not None:
                     print("try to load fp32 model")
@@ -100,7 +98,7 @@ def _load_target_model(name_or_path: str, vae_path: Optional[str], model_version
         # Diffusers U-Net to original U-Net
         state_dict = sdxl_model_util.convert_diffusers_unet_state_dict_to_sdxl(unet.state_dict())
         with init_empty_weights():
-            unet = sdxl_original_unet.SdxlUNet2DConditionModel()  # overwrite unet
+            unet = sdxl_original_unet.SdxlUNet2DConditionModel() # overwrite unet
         sdxl_model_util._load_state_dict_on_device(unet, state_dict, device=device)
         print("U-Net converted to original U-Net")
 
@@ -199,7 +197,6 @@ def save_sd_model_on_train_end(
     ckpt_info,
 ):
     def sd_saver(ckpt_file, epoch_no, global_step):
-        sai_metadata = train_util.get_sai_model_spec(None, args, True, False, False, is_stable_diffusion_ckpt=True)
         sdxl_model_util.save_stable_diffusion_checkpoint(
             ckpt_file,
             text_encoder1,
@@ -210,7 +207,6 @@ def save_sd_model_on_train_end(
             ckpt_info,
             vae,
             logit_scale,
-            sai_metadata,
             save_dtype,
         )
 
@@ -252,7 +248,6 @@ def save_sd_model_on_epoch_end_or_stepwise(
     ckpt_info,
 ):
     def sd_saver(ckpt_file, epoch_no, global_step):
-        sai_metadata = train_util.get_sai_model_spec(None, args, True, False, False, is_stable_diffusion_ckpt=True)
         sdxl_model_util.save_stable_diffusion_checkpoint(
             ckpt_file,
             text_encoder1,
@@ -263,7 +258,6 @@ def save_sd_model_on_epoch_end_or_stepwise(
             ckpt_info,
             vae,
             logit_scale,
-            sai_metadata,
             save_dtype,
         )
 
