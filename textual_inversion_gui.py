@@ -722,68 +722,66 @@ def ti_tab(
         with gr.Tab('Folders'):
             folders = Folders(headless=headless)
         with gr.Tab('Parameters'):
-            with gr.Tab('Basic', elem_id='basic_tab'):
-                with gr.Row():
-                    weights = gr.Textbox(
-                        label='Resume TI training',
-                        placeholder='(Optional) Path to existing TI embeding file to keep training',
-                    )
-                    weights_file_input = gr.Button(
-                        '📂', elem_id='open_folder_small', visible=(not headless)
-                    )
-                    weights_file_input.click(
-                        get_file_path,
-                        outputs=weights,
-                        show_progress=False,
-                    )
-                with gr.Row():
-                    token_string = gr.Textbox(
-                        label='Token string',
-                        placeholder='eg: cat',
-                    )
-                    init_word = gr.Textbox(
-                        label='Init word',
-                        value='*',
-                    )
-                    num_vectors_per_token = gr.Slider(
-                        minimum=1,
-                        maximum=75,
-                        value=1,
-                        step=1,
-                        label='Vectors',
-                    )
-                    max_train_steps = gr.Textbox(
-                        label='Max train steps',
-                        placeholder='(Optional) Maximum number of steps',
-                    )
-                    template = gr.Dropdown(
-                        label='Template',
-                        choices=[
-                            'caption',
-                            'object template',
-                            'style template',
-                        ],
-                        value='caption',
-                    )
-                basic_training = BasicTraining(
-                    learning_rate_value='1e-5',
-                    lr_scheduler_value='cosine',
-                    lr_warmup_value='10',
+            with gr.Row():
+                weights = gr.Textbox(
+                    label='Resume TI training',
+                    placeholder='(Optional) Path to existing TI embeding file to keep training',
                 )
+                weights_file_input = gr.Button(
+                    '📂', elem_id='open_folder_small', visible=(not headless)
+                )
+                weights_file_input.click(
+                    get_file_path,
+                    outputs=weights,
+                    show_progress=False,
+                )
+            with gr.Row():
+                token_string = gr.Textbox(
+                    label='Token string',
+                    placeholder='eg: cat',
+                )
+                init_word = gr.Textbox(
+                    label='Init word',
+                    value='*',
+                )
+                num_vectors_per_token = gr.Slider(
+                    minimum=1,
+                    maximum=75,
+                    value=1,
+                    step=1,
+                    label='Vectors',
+                )
+                max_train_steps = gr.Textbox(
+                    label='Max train steps',
+                    placeholder='(Optional) Maximum number of steps',
+                )
+                template = gr.Dropdown(
+                    label='Template',
+                    choices=[
+                        'caption',
+                        'object template',
+                        'style template',
+                    ],
+                    value='caption',
+                )
+            basic_training = BasicTraining(
+                learning_rate_value='1e-5',
+                lr_scheduler_value='cosine',
+                lr_warmup_value='10',
+            )
                     
-                # Add SDXL Parameters
-                sdxl_params = SDXLParameters(source_model.sdxl_checkbox, show_sdxl_cache_text_encoder_outputs=False)
+            # Add SDXL Parameters
+            sdxl_params = SDXLParameters(source_model.sdxl_checkbox, show_sdxl_cache_text_encoder_outputs=False)
                 
-            with gr.Tab('Advanced', elem_id='advanced_tab'):
+            with gr.Accordion('Advanced Configuration', open=False):
                 advanced_training = AdvancedTraining(headless=headless)
                 advanced_training.color_aug.change(
                     color_aug_changed,
                     inputs=[advanced_training.color_aug],
                     outputs=[basic_training.cache_latents],
                 )
-            
-            with gr.Tab('Samples', elem_id='samples_tab'):
-                sample = SampleImages()
+
+            sample = SampleImages()
 
         with gr.Tab('Tools'):
             gr.Markdown(

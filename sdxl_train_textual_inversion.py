@@ -13,7 +13,6 @@ class SdxlTextualInversionTrainer(train_textual_inversion.TextualInversionTraine
     def __init__(self):
         super().__init__()
         self.vae_scale_factor = sdxl_model_util.VAE_SCALE_FACTOR
-        self.is_sdxl = True
 
     def assert_extra_args(self, args, train_dataset_group):
         super().assert_extra_args(args, train_dataset_group)
@@ -28,13 +27,13 @@ class SdxlTextualInversionTrainer(train_textual_inversion.TextualInversionTraine
             unet,
             logit_scale,
             ckpt_info,
-        ) = sdxl_train_util.load_target_model(args, accelerator, sdxl_model_util.MODEL_VERSION_SDXL_BASE_V1_0, weight_dtype)
+        ) = sdxl_train_util.load_target_model(args, accelerator, sdxl_model_util.MODEL_VERSION_SDXL_BASE_V0_9, weight_dtype)
 
         self.load_stable_diffusion_format = load_stable_diffusion_format
         self.logit_scale = logit_scale
         self.ckpt_info = ckpt_info
 
-        return sdxl_model_util.MODEL_VERSION_SDXL_BASE_V1_0, [text_encoder1, text_encoder2], vae, unet
+        return sdxl_model_util.MODEL_VERSION_SDXL_BASE_V0_9, [text_encoder1, text_encoder2], vae, unet
 
     def load_tokenizer(self, args):
         tokenizer = sdxl_train_util.load_tokenizers(args)
@@ -80,7 +79,7 @@ class SdxlTextualInversionTrainer(train_textual_inversion.TextualInversionTraine
             accelerator, args, epoch, global_step, device, vae, tokenizer, text_encoder, unet, prompt_replacement
         )
 
-    def save_weights(self, file, updated_embs, save_dtype, metadata):
+    def save_weights(self, file, updated_embs, save_dtype):
         state_dict = {"clip_l": updated_embs[0], "clip_g": updated_embs[1]}
 
         if save_dtype is not None:
@@ -92,7 +91,7 @@ class SdxlTextualInversionTrainer(train_textual_inversion.TextualInversionTraine
         if os.path.splitext(file)[1] == ".safetensors":
             from safetensors.torch import save_file
 
-            save_file(state_dict, file, metadata)
+            save_file(state_dict, file)
         else:
             torch.save(state_dict, file)
 

@@ -31,7 +31,6 @@ from library.class_basic_training import BasicTraining
 from library.class_advanced_training import AdvancedTraining
 from library.class_folders import Folders
 from library.class_command_executor import CommandExecutor
-from library.class_sdxl_parameters import SDXLParameters
 from library.tensorboard_gui import (
     gradio_tensorboard,
     start_tensorboard,
@@ -703,26 +702,23 @@ def dreambooth_tab(
         with gr.Tab('Folders'):
             folders = Folders(headless=headless)
         with gr.Tab('Parameters'):
-            with gr.Tab('Basic', elem_id='basic_tab'):
-                basic_training = BasicTraining(
-                    learning_rate_value='1e-5',
-                    lr_scheduler_value='cosine',
-                    lr_warmup_value='10',
-                )
-                    
-                # # Add SDXL Parameters
-                # sdxl_params = SDXLParameters(source_model.sdxl_checkbox, show_sdxl_cache_text_encoder_outputs=False)
-            
-            with gr.Tab('Advanced', elem_id='advanced_tab'):
+            basic_training = BasicTraining(
+                learning_rate_value='1e-5',
+                lr_scheduler_value='cosine',
+                lr_warmup_value='10',
+            )
+            full_bf16 = gr.Checkbox(
+                label='Full bf16', value = False
+            )
+            with gr.Accordion('Advanced Configuration', open=False):
                 advanced_training = AdvancedTraining(headless=headless)
                 advanced_training.color_aug.change(
                     color_aug_changed,
                     inputs=[advanced_training.color_aug],
                     outputs=[basic_training.cache_latents],
                 )
-            
-            with gr.Tab('Samples', elem_id='samples_tab'):
-                sample = SampleImages()
+
+            sample = SampleImages()
 
         with gr.Tab('Tools'):
             gr.Markdown(
@@ -783,7 +779,7 @@ def dreambooth_tab(
             basic_training.enable_bucket,
             advanced_training.gradient_checkpointing,
             advanced_training.full_fp16,
-            advanced_training.full_bf16,
+            full_bf16,
             advanced_training.no_token_padding,
             basic_training.stop_text_encoder_training,
             basic_training.min_bucket_reso,
